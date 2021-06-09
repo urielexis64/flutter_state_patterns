@@ -12,6 +12,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => UserService(),
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Material App',
         initialRoute: 'page1',
         routes: {
