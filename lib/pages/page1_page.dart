@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:status/bloc/user/user_bloc.dart';
+import 'package:status/models/user.dart';
 
 class Page1Page extends StatelessWidget {
   @override
@@ -6,8 +9,22 @@ class Page1Page extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           title: Text('Page 1'),
+          actions: [
+            IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () {
+                  context.read<UserBloc>().add(DeleteUser());
+                })
+          ],
         ),
-        body: UserInfo(),
+        body: BlocBuilder<UserBloc, UserState>(
+          builder: (_, state) {
+            if (state.userExists) return UserInfo(state.user);
+            return Center(
+              child: Text('There is no user'),
+            );
+          },
+        ),
         floatingActionButton: FloatingActionButton(
           onPressed: () => Navigator.pushNamed(context, 'page2'),
           child: Icon(Icons.arrow_forward_rounded),
@@ -16,6 +33,10 @@ class Page1Page extends StatelessWidget {
 }
 
 class UserInfo extends StatelessWidget {
+  final User user;
+
+  UserInfo(this.user);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -28,13 +49,13 @@ class UserInfo extends StatelessWidget {
           Text('General',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           Divider(),
-          ListTile(title: Text('Name: ')),
-          ListTile(title: Text('Age: ')),
+          ListTile(title: Text('Name: ${user.name}')),
+          ListTile(title: Text('Age: ${user.age}')),
           Text('Professions',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           Divider(),
-          ...List.generate(1,
-                  (index) => ListTile(title: Text('Profession ${index + 1}: ')))
+          ...user.professions
+              .map((profession) => ListTile(title: Text(profession)))
               .toList()
         ],
       ),
